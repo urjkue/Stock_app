@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form id="loginForm" action="/login" method="POST">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+
+    <p id="message"></p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+    <script>
+        document.querySelector('#loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.querySelector("#username").value
+            const password = document.querySelector('#password').value
+            try {
+                const response = await axios.post('/log', { username, password });
+                if (response.data === 'Login Successful') {
+                    window.location.href = '/profile'; // Redirect to profile page on successful login
+                } else {
+                    document.getElementById('message').innerText = response.data;
+                    
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
