@@ -26,16 +26,25 @@ app.get('/register', (req, res) => {
 
 // Registration route
 app.post('/regis', (req, res) => {
-  const test = { username, password } = req.body;
-  console.log(test) // <-- Issue here
-  db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, password], (err) => {
-      if (err) {
-          res.status(500).send('Error registering user');
-      } else {
+  const { username, password } = req.body;
+  console.log({ username, password });
+  db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, password], function(err) {
+    if (err) {
+      res.status(500).send('Error registering user');
+    } else {
+      const user_id = this.lastID; // Get the last inserted row ID
+      console.log('User ID:', user_id);
+      db.run("INSERT INTO stocks (stocks, user_id) VALUES (?, ?)", [JSON.stringify([]), user_id], function(err) {
+        if (err) {
+          res.status(500).send('Error creating stock record for user');
+        } else {
           res.send('Registration Successful');
-      }
+        }
+      });
+    }
   });
 });
+
 
 
 
@@ -58,6 +67,9 @@ app.post('/log', (req, res) => {
         console.log(user)
           req.session.user = user;
           console.log(user)
+
+
+
           res.send('Login Successful');
       }
   });
@@ -76,8 +88,22 @@ function requireLogin(req, res, next) {
     }
 }
 
+app.post('/data',requireLogin,(req,res)=>{
+
+  const userId = req.session.user.id;
+  db.get("SELECT stocks FROM stocks WHERE user_id = ?;",userId, (err, row) => {
+    if (err) {
+        console.error("Error:", err);
+    } else {
+        console.log(row);
+        res.send(row.stocks);
+    }
+});
+
+})
+
 app.get('/profile', requireLogin, (req, res) => {
-    res.send('Profile Page');
+  res.sendFile(__dirname + '/public/profile.html');
 });
 
 app.listen(PORT, () => {
