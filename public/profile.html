@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+</head>
+<body>
+  <h1>Profile</h1>
+  <p>
+
+    <h2 id="message"></h2>
+  </p>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.4/axios.min.js"></script>
+  <script>
+    // Define an async function to fetch data and update the message element
+    async function fetchDataAndUpdateMessage() {
+      try {
+        const response = await axios.post('/data');
+        document.querySelector("#message").innerText = response.data;
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  
+    // Call the async function when the DOM content is loaded
+    document.addEventListener('DOMContentLoaded', fetchDataAndUpdateMessage);
+  </script>
+
+</body>
+</html>
