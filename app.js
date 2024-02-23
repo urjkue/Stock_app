@@ -1,17 +1,25 @@
-// app.js
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const Redis = require('ioredis'); // Import the Redis module
+const RedisStore = require('connect-redis')(session);
 const bcrypt = require('bcryptjs');
 const db = require('./db/schema'); // Import the database schema
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
-app.use(bodyParser.json()); // Parse JSON bodies
+// Create a Redis client
+const redisClient = new Redis({
+  host: 'localhost', // Redis server host
+  port: 6379, // Redis server port
+});
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(session({
-    secret: 'your-secret-key', // Provide a secret key for session encryption
+    store: new RedisStore({ client: redisClient }), // Pass the Redis client to the RedisStore
+    secret: 'your-secret-key',
     resave: false,
     saveUninitialized: true
 }));
